@@ -1,5 +1,6 @@
 package com.shailendrachoudhary.snakeNLadder;
 
+import com.shailendrachoudhary.snakeNLadder.constants.DiceType;
 import com.shailendrachoudhary.snakeNLadder.constants.PlayerStatus;
 import com.shailendrachoudhary.snakeNLadder.exceptions.GameOverException;
 import com.shailendrachoudhary.snakeNLadder.exceptions.InvalidGameException;
@@ -11,8 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -120,6 +120,16 @@ public class BoardTest {
     public void testInvalidLadder(){
 
         assertThrows(InvalidLadderException.class, ()-> new Ladder(10,2));
+    }
+
+    @Test
+    public void testCrookedDice(){
+        Dice dice = DiceFactory.getDice(DiceType.CROOKED);
+        for(int i=0;i<10;i++){
+            int faceUp = dice.roll();
+            System.out.println("Value on rolled dice "+faceUp);
+            assertEquals(dice.roll()%2==0,true);
+        }
     }
 
 }

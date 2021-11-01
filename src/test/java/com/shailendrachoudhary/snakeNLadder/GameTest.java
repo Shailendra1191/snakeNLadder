@@ -23,20 +23,24 @@ import static org.mockito.Mockito.when;
 public class GameTest {
     GameService gameService;
     Dice mockDice;
+    Board board;
+    List<Player> players;
+    List<Ladder> ladders;
+    List<Snake> snakes;
 
     @BeforeAll
     public void setUp(){
-        List<Player> palyers = Arrays.asList(new Player("player1"),
+        players = Arrays.asList(new Player("player1"),
                 new Player("player2"));
 
-        List<Snake> snakes = Arrays.asList(new Snake(98,2),
+        snakes = Arrays.asList(new Snake(98,2),
                 new Snake(92,70),
                 new Snake(76,45),
                 new Snake(23,5),
                 new Snake(50,28)
         );
 
-        List<Ladder> ladders = Arrays.asList(
+        ladders = Arrays.asList(
                 new Ladder(9,13),
                 new Ladder(6,97),
                 new Ladder(26,48),
@@ -44,11 +48,11 @@ public class GameTest {
                 new Ladder(25,79)
         );
 
-        Board board = new Board(100, snakes, ladders);
+        board = new Board(100, snakes, ladders);
 
         mockDice = mock(Dice.class);
 
-        Game game = new Game(board,palyers,mockDice);
+        Game game = new Game(board,players,mockDice);
 
         gameService = new DefaultGameService(game);
 
@@ -104,10 +108,33 @@ public class GameTest {
 
     @Test
     public void testInvalidGame(){
-        Game game = new Game(mock(Board.class),Arrays.asList(),new DefaultDice());
+        Game game = new Game(mock(Board.class),Arrays.asList(),DiceFactory.getDefault());
         assertThrows(InvalidGameException.class, ()-> game.getCurrentPlayer() );
 
         assertThrows(InvalidGameException.class, ()-> game.nextPlayer());
+    }
+
+    @Test
+    public void testMultipleRounds(){
+        for(int i=0;i<10;i++){
+            players = Arrays.asList(new Player("player1"),
+                    new Player("player2"));
+            System.out.println("Starting new Game...");
+
+            Game game = new Game(board,players,DiceFactory.getDefault());
+            gameService = new DefaultGameService(game);
+            while (game.getGameStatus()==GameStatus.ACTIVE){
+                System.out.println("Current Player:"+gameService.getCurrentPlayer().getName());
+                Player p = gameService.play();
+                System.out.println("Player "+p.getName()+" moved to "+p.getCurrentPosition());
+                if(p.getPlayerStatus()==PlayerStatus.WON){
+                    System.out.println("Player "+p.getName()+" WON !!!");
+                    gameService.terminateGame();
+                }
+            }
+            assertEquals(game.getGameStatus(),GameStatus.TERMINATED);
+            System.out.println("Game Over !\n");
+        }
     }
 
 }
