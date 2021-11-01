@@ -7,4 +7,6 @@ public interface GameService {
     Player play();
 
     Player getCurrentPlayer();
+
+    void terminateGame();
 }

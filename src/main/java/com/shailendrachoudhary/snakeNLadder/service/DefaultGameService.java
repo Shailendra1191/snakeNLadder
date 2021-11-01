@@ -1,6 +1,8 @@
 package com.shailendrachoudhary.snakeNLadder.service;
+import com.shailendrachoudhary.snakeNLadder.constants.GameStatus;
+import com.shailendrachoudhary.snakeNLadder.constants.PlayerStatus;
 import com.shailendrachoudhary.snakeNLadder.exceptions.GameOverException;
-import com.shailendrachoudhary.snakeNLadder.exceptions.NoActiveGameFoundException;
+import com.shailendrachoudhary.snakeNLadder.exceptions.InvalidGameException;
 import com.shailendrachoudhary.snakeNLadder.model.Game;
 import com.shailendrachoudhary.snakeNLadder.model.Player;
 
@@ -14,7 +16,7 @@ public class DefaultGameService implements GameService{
     @Override
     public Player play() {
         if(game == null){
-            throw new NoActiveGameFoundException();
+            throw new InvalidGameException("No Active Game Exists. Please start a new one");
         }
         if(game.isGameTerminated()){
             throw new GameOverException();
@@ -26,7 +28,7 @@ public class DefaultGameService implements GameService{
         int nextPos = player.getCurrentPosition()+count;
         game.movePlayer(player,nextPos);
 
-        game.nextPlayer(player);
+        game.nextPlayer();
 
         return player;
         
@@ -37,6 +39,10 @@ public class DefaultGameService implements GameService{
             throw new GameOverException();
         }
         return game.getCurrentPlayer();
+    }
+
+    public void terminateGame(){
+        game.setGameStatus(GameStatus.TERMINATED);
     }
 
 }

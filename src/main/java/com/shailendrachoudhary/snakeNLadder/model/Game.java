@@ -3,6 +3,7 @@ package com.shailendrachoudhary.snakeNLadder.model;
 import com.shailendrachoudhary.snakeNLadder.constants.GameStatus;
 import com.shailendrachoudhary.snakeNLadder.constants.PlayerStatus;
 import com.shailendrachoudhary.snakeNLadder.exceptions.GameOverException;
+import com.shailendrachoudhary.snakeNLadder.exceptions.InvalidGameException;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -56,11 +57,15 @@ public class Game {
         return players.peek();
     }
 
-    public Player nextPlayer(Player currentPlayer) {
-        if(currentPlayer != null && currentPlayer.getPlayerStatus() == PlayerStatus.ACTIVE){
+    public Player nextPlayer() {
+        if(players.isEmpty()){
+            throw new InvalidGameException("empty player List");
+        }
+        Player currentPlayer = players.poll();
+        if(currentPlayer.getPlayerStatus()==PlayerStatus.ACTIVE){
             players.add(currentPlayer);
         }
-        return players.poll();
+        return players.peek();
     }
 
     public boolean isGameTerminated(){
