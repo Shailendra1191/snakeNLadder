@@ -3,30 +3,37 @@ package com.shailendrachoudhary.snakeNLadder.model;
 import com.shailendrachoudhary.snakeNLadder.constants.GameStatus;
 import com.shailendrachoudhary.snakeNLadder.constants.PlayerStatus;
 import com.shailendrachoudhary.snakeNLadder.exceptions.GameOverException;
-import com.shailendrachoudhary.snakeNLadder.exceptions.InvalidGameException;
+import com.shailendrachoudhary.snakeNLadder.providers.PlayerSelectionProvider;
+import com.shailendrachoudhary.snakeNLadder.providers.PlayerSelectionProviderFactory;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
-import java.util.stream.Collectors;
 
 public class Game {
 
     @Getter
     private Board board;
-    private Queue<Player> players;
+    private List<Player> players;
     private Dice dice;
     @Getter @Setter
     private GameStatus gameStatus;
+
+    private PlayerSelectionProvider playerSelector;
 
     public Game(@NonNull Board board, @NonNull List<Player> players, @NonNull Dice dice){
         this.board = board;
         this.players = new LinkedList<>(players);
         this.dice = dice;
         gameStatus = GameStatus.ACTIVE;
+        playerSelector = PlayerSelectionProviderFactory.getDefault(players);
+    }
+
+    public Game(@NonNull Board board, @NonNull List<Player> players, @NonNull Dice dice, @NonNull PlayerSelectionProvider selector){
+        this(board,players,dice);
+        playerSelector = PlayerSelectionProviderFactory.getDefault(players);
     }
 
     public int rollADice() {
@@ -54,21 +61,11 @@ public class Game {
     }
 
     public Player getCurrentPlayer(){
-        if(players.isEmpty()){
-            throw new InvalidGameException("empty player List");
-        }
-        return players.peek();
+        return playerSelector.currentPlayer();
     }
 
     public Player nextPlayer() {
-        if(players.isEmpty()){
-            throw new InvalidGameException("empty player List");
-        }
-        Player currentPlayer = players.poll();
-        if(currentPlayer.getPlayerStatus()==PlayerStatus.ACTIVE){
-            players.add(currentPlayer);
-        }
-        return players.peek();
+        return playerSelector.nextPlayer();
     }
 
     public boolean isGameTerminated(){
@@ -76,7 +73,7 @@ public class Game {
     }
 
     public List<Player> getPlayers(){
-        return players.stream().collect(Collectors.toList());
+        return players;
     }
     
 }
