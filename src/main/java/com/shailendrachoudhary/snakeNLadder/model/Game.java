@@ -3,6 +3,8 @@ package com.shailendrachoudhary.snakeNLadder.model;
 import com.shailendrachoudhary.snakeNLadder.constants.GameStatus;
 import com.shailendrachoudhary.snakeNLadder.constants.PlayerStatus;
 import com.shailendrachoudhary.snakeNLadder.exceptions.GameOverException;
+import com.shailendrachoudhary.snakeNLadder.providers.GameTerminationProvider;
+import com.shailendrachoudhary.snakeNLadder.providers.GameTerminationProviderFactory;
 import com.shailendrachoudhary.snakeNLadder.providers.PlayerSelectionProvider;
 import com.shailendrachoudhary.snakeNLadder.providers.PlayerSelectionProviderFactory;
 import lombok.Getter;
@@ -22,6 +24,7 @@ public class Game {
     private GameStatus gameStatus;
 
     private PlayerSelectionProvider playerSelector;
+    private GameTerminationProvider gameTerminator;
 
     public Game(@NonNull Board board, @NonNull List<Player> players, @NonNull Dice dice){
         this.board = board;
@@ -29,11 +32,18 @@ public class Game {
         this.dice = dice;
         gameStatus = GameStatus.ACTIVE;
         playerSelector = PlayerSelectionProviderFactory.getDefault(players);
+        gameTerminator = GameTerminationProviderFactory.getDefault(this);
     }
 
     public Game(@NonNull Board board, @NonNull List<Player> players, @NonNull Dice dice, @NonNull PlayerSelectionProvider selector){
         this(board,players,dice);
-        playerSelector = PlayerSelectionProviderFactory.getDefault(players);
+        playerSelector = selector;
+    }
+
+    public Game(@NonNull Board board, @NonNull List<Player> players, @NonNull Dice dice,
+                @NonNull PlayerSelectionProvider selector, @NonNull GameTerminationProvider terminator){
+        this(board,players,dice,selector);
+        gameTerminator = terminator;
     }
 
     public int rollADice() {
@@ -54,8 +64,11 @@ public class Game {
             }
         }
 
-        if(board.isFinalSpot(nextPos)){
+        if(board.isFinalSpot(player.getCurrentPosition())){
             player.setPlayerStatus(PlayerStatus.WON);
+            if(gameTerminator.canTerminate()){
+                gameTerminator.terminate();
+            }
         }
 
     }
