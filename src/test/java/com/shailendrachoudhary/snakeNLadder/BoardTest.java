@@ -1,6 +1,10 @@
 package com.shailendrachoudhary.snakeNLadder;
 
 import com.shailendrachoudhary.snakeNLadder.constants.PlayerStatus;
+import com.shailendrachoudhary.snakeNLadder.exceptions.GameOverException;
+import com.shailendrachoudhary.snakeNLadder.exceptions.InvalidGameException;
+import com.shailendrachoudhary.snakeNLadder.exceptions.InvalidLadderException;
+import com.shailendrachoudhary.snakeNLadder.exceptions.InvalidSnakeException;
 import com.shailendrachoudhary.snakeNLadder.model.*;
 import org.junit.jupiter.api.Test;
 
@@ -8,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -104,4 +109,17 @@ public class BoardTest {
         // assertion to test the status of current player changed to WON
         assertEquals(players.get(0).getPlayerStatus(), PlayerStatus.WON);
     }
+
+    @Test
+    public void testInvalidSnake(){
+
+        assertThrows(InvalidSnakeException.class, ()-> new Snake(2,10));
+    }
+
+    @Test
+    public void testInvalidLadder(){
+
+        assertThrows(InvalidLadderException.class, ()-> new Ladder(10,2));
+    }
+
 }

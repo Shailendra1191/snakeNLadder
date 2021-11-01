@@ -1,6 +1,9 @@
 package com.shailendrachoudhary.snakeNLadder;
 
+import com.shailendrachoudhary.snakeNLadder.constants.GameStatus;
 import com.shailendrachoudhary.snakeNLadder.constants.PlayerStatus;
+import com.shailendrachoudhary.snakeNLadder.exceptions.GameOverException;
+import com.shailendrachoudhary.snakeNLadder.exceptions.InvalidGameException;
 import com.shailendrachoudhary.snakeNLadder.model.*;
 import com.shailendrachoudhary.snakeNLadder.service.DefaultGameService;
 import com.shailendrachoudhary.snakeNLadder.service.GameService;
@@ -11,8 +14,8 @@ import org.junit.jupiter.api.TestInstance;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -89,4 +92,22 @@ public class GameTest {
 
         System.out.println("Player "+p.getName()+" player status "+p.getPlayerStatus());
     }
+
+    @Test
+    public void testGameOver(){
+        Game game = new Game(mock(Board.class),Arrays.asList(),mock(Dice.class));
+
+        game.setGameStatus(GameStatus.TERMINATED);
+
+        assertThrows(GameOverException.class, ()-> game.movePlayer(mock(Player.class),10));
+    }
+
+    @Test
+    public void testInvalidGame(){
+        Game game = new Game(mock(Board.class),Arrays.asList(),new DefaultDice());
+        assertThrows(InvalidGameException.class, ()-> game.getCurrentPlayer() );
+
+        assertThrows(InvalidGameException.class, ()-> game.nextPlayer());
+    }
+
 }

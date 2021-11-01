@@ -54,6 +54,9 @@ public class Game {
     }
 
     public Player getCurrentPlayer(){
+        if(players.isEmpty()){
+            throw new InvalidGameException("empty player List");
+        }
         return players.peek();
     }
 
