@@ -8,6 +8,7 @@ import com.shailendrachoudhary.snakeNLadder.model.*;
 import com.shailendrachoudhary.snakeNLadder.service.DefaultGameService;
 import com.shailendrachoudhary.snakeNLadder.service.GameService;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
@@ -30,8 +31,6 @@ public class GameTest {
 
     @BeforeAll
     public void setUp(){
-        players = Arrays.asList(new Player("player1"),
-                new Player("player2"));
 
         snakes = Arrays.asList(new Snake(98,2),
                 new Snake(92,70),
@@ -52,10 +51,16 @@ public class GameTest {
 
         mockDice = mock(Dice.class);
 
+    }
+
+    @BeforeEach
+    public void setupPlayers(){
+        players = Arrays.asList(new Player("player1"),
+                new Player("player2"));
+
         Game game = new Game(board,players,mockDice);
 
         gameService = new DefaultGameService(game);
-
     }
 
     @Test
@@ -99,26 +104,25 @@ public class GameTest {
 
     @Test
     public void testGameOver(){
-        Game game = new Game(mock(Board.class),Arrays.asList(),mock(Dice.class));
+        Game gameLocal = new Game(mock(Board.class),Arrays.asList(),mock(Dice.class));
 
-        game.setGameStatus(GameStatus.TERMINATED);
+        gameLocal.setGameStatus(GameStatus.TERMINATED);
 
-        assertThrows(GameOverException.class, ()-> game.movePlayer(mock(Player.class),10));
+        assertThrows(GameOverException.class, ()-> gameLocal.movePlayer(mock(Player.class),10));
     }
 
     @Test
     public void testInvalidGame(){
-        Game game = new Game(mock(Board.class),Arrays.asList(),DiceFactory.getDefault());
-        assertThrows(InvalidGameException.class, ()-> game.getCurrentPlayer() );
+        Game gameLocal = new Game(mock(Board.class),Arrays.asList(),DiceFactory.getDefault());
+        assertThrows(InvalidGameException.class, ()-> gameLocal.getCurrentPlayer() );
 
-        assertThrows(InvalidGameException.class, ()-> game.nextPlayer());
+        assertThrows(InvalidGameException.class, ()-> gameLocal.nextPlayer());
     }
 
     @Test
     public void testMultipleRounds(){
         for(int i=0;i<10;i++){
-            players = Arrays.asList(new Player("player1"),
-                    new Player("player2"));
+            setupPlayers();
             System.out.println("Starting new Game...");
 
             Game game = new Game(board,players,DiceFactory.getDefault());
@@ -127,14 +131,31 @@ public class GameTest {
                 System.out.println("Current Player:"+gameService.getCurrentPlayer().getName());
                 Player p = gameService.play();
                 System.out.println("Player "+p.getName()+" moved to "+p.getCurrentPosition());
-                if(p.getPlayerStatus()==PlayerStatus.WON){
-                    System.out.println("Player "+p.getName()+" WON !!!");
-                    gameService.terminateGame();
-                }
             }
             assertEquals(game.getGameStatus(),GameStatus.TERMINATED);
             System.out.println("Game Over !\n");
         }
     }
+
+    @Test
+    public void testFirstPlayerWinGameTermination(){
+            System.out.println("Starting new Game...");
+
+            Game game = new Game(board,players,DiceFactory.getDefault());
+            gameService = new DefaultGameService(game);
+            while (game.getGameStatus()==GameStatus.ACTIVE){
+                System.out.println("Current Player:"+gameService.getCurrentPlayer().getName());
+                Player p = gameService.play();
+                System.out.println("Player "+p.getName()+" moved to "+p.getCurrentPosition());
+
+                if(p.getPlayerStatus()==PlayerStatus.WON){
+                    assertEquals(game.getGameStatus(),GameStatus.TERMINATED);
+                }
+            }
+
+            System.out.println("Game Over !\n");
+    }
+
+
 
 }
