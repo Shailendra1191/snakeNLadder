@@ -7,18 +7,17 @@ import com.shailendrachoudhary.snakeNLadder.exceptions.InvalidGameException;
 import com.shailendrachoudhary.snakeNLadder.model.*;
 import com.shailendrachoudhary.snakeNLadder.service.DefaultGameService;
 import com.shailendrachoudhary.snakeNLadder.service.GameService;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class GameTest {
@@ -29,15 +28,39 @@ public class GameTest {
     List<Ladder> ladders;
     List<Snake> snakes;
 
-    @BeforeAll
+    @BeforeEach
     public void setUp(){
         gameService = new DefaultGameService();
+        mockDice = mock(Dice.class);
+        snakes = Arrays.asList(new Snake(98,2),
+                new Snake(92,70),
+                new Snake(76,45),
+                new Snake(23,5),
+                new Snake(50,28)
+        );
+
+        ladders = Arrays.asList(
+                new Ladder(9,13),
+                new Ladder(6,97),
+                new Ladder(26,48),
+                new Ladder(73,91),
+                new Ladder(25,79)
+        );
+
+        players = Arrays.asList(new Player("player1"),
+                new Player("player2"));
+
+        board = new Board(100, snakes, ladders);
     }
 
 
     @Test
     public void testTwoPlayerGame(){
         System.out.println("Starting a new game...");
+
+        Game game  = new Game(board,players,mockDice);
+
+        ReflectionTestUtils.setField(gameService,"game",game);
 
         Player p = gameService.getCurrentPlayer();
 
@@ -65,10 +88,10 @@ public class GameTest {
         p = gameService.getCurrentPlayer();
         assertEquals(p.getName(),"player1");
 
-        when(mockDice.roll()).thenReturn(2);
+        when(mockDice.roll()).thenReturn(3);
 
         p=gameService.play();
-        assertEquals(p.getCurrentPosition(),99);
+        assertEquals(p.getCurrentPosition(),100);
         assertEquals(p.getPlayerStatus(), PlayerStatus.WON);
 
         System.out.println("Player "+p.getName()+" player status "+p.getPlayerStatus());
@@ -115,6 +138,10 @@ public class GameTest {
             while (gameService.getGameStatus()==GameStatus.ACTIVE){
                 System.out.println("Current Player:"+gameService.getCurrentPlayer().getName());
                 Player p = gameService.play();
+
+                if(p.getPlayerStatus()==PlayerStatus.WON){
+                    assertEquals(gameService.getGameStatus(),GameStatus.TERMINATED);
+                }
                 System.out.println("Player "+p.getName()+" moved to "+p.getCurrentPosition());
             }
 

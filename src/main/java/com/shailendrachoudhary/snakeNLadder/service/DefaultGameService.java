@@ -13,7 +13,8 @@ import java.util.stream.IntStream;
 public class DefaultGameService implements GameService{
     private Game game;
 
-    public DefaultGameService(){}
+    public DefaultGameService(){
+    }
 
     @Override
     public void newGame(int players, Dice dice) {
@@ -25,9 +26,7 @@ public class DefaultGameService implements GameService{
 
     @Override
     public Player play() {
-        if(game == null){
-            throw new InvalidGameException("No Active Game Exists. Please start a new one");
-        }
+        validateGame();
         if(game.isGameTerminated()){
             throw new GameOverException();
         }
@@ -45,19 +44,25 @@ public class DefaultGameService implements GameService{
     }
 
     public Player getCurrentPlayer(){
-        if(game.isGameTerminated()){
-            throw new GameOverException();
-        }
+        validateGame();
         return game.getCurrentPlayer();
     }
 
     public void terminateGame(){
+        validateGame();
         game.setGameStatus(GameStatus.TERMINATED);
     }
 
     @Override
     public GameStatus getGameStatus() {
+        validateGame();
         return game.getGameStatus();
+    }
+
+    private void validateGame(){
+        if(game == null){
+            throw new InvalidGameException("No Game Initiated. Please start a new one");
+        }
     }
 
 }

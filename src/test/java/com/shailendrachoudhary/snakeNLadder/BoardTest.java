@@ -93,9 +93,9 @@ public class BoardTest {
         Board board = new Board(10,snakes,ladders);
 
         Dice mockDice = mock(Dice.class);
-        when(mockDice.roll()).thenReturn(9);
+        when(mockDice.roll()).thenReturn(10);
 
-        assertEquals(mockDice.roll(),9);
+        assertEquals(mockDice.roll(),10);
 
         Game game  = new Game(board,players,mockDice);
 
@@ -104,7 +104,7 @@ public class BoardTest {
 
         System.out.println("New position: "+players.get(0).getCurrentPosition());
 
-        assertEquals(players.get(0).getCurrentPosition(),9);
+        assertEquals(players.get(0).getCurrentPosition(),10);
 
         // assertion to test the status of current player changed to WON
         assertEquals(players.get(0).getPlayerStatus(), PlayerStatus.WON);
