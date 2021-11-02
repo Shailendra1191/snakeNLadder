@@ -31,37 +31,9 @@ public class GameTest {
 
     @BeforeAll
     public void setUp(){
-
-        snakes = Arrays.asList(new Snake(98,2),
-                new Snake(92,70),
-                new Snake(76,45),
-                new Snake(23,5),
-                new Snake(50,28)
-        );
-
-        ladders = Arrays.asList(
-                new Ladder(9,13),
-                new Ladder(6,97),
-                new Ladder(26,48),
-                new Ladder(73,91),
-                new Ladder(25,79)
-        );
-
-        board = new Board(100, snakes, ladders);
-
-        mockDice = mock(Dice.class);
-
+        gameService = new DefaultGameService();
     }
 
-    @BeforeEach
-    public void setupPlayers(){
-        players = Arrays.asList(new Player("player1"),
-                new Player("player2"));
-
-        Game game = new Game(board,players,mockDice);
-
-        gameService = new DefaultGameService(game);
-    }
 
     @Test
     public void testTwoPlayerGame(){
@@ -122,17 +94,14 @@ public class GameTest {
     @Test
     public void testMultipleRounds(){
         for(int i=0;i<10;i++){
-            setupPlayers();
             System.out.println("Starting new Game...");
-
-            Game game = new Game(board,players,DiceFactory.getDefault());
-            gameService = new DefaultGameService(game);
-            while (game.getGameStatus()==GameStatus.ACTIVE){
+            gameService.newGame(2,DiceFactory.getDefault());
+            while (gameService.getGameStatus()==GameStatus.ACTIVE){
                 System.out.println("Current Player:"+gameService.getCurrentPlayer().getName());
                 Player p = gameService.play();
                 System.out.println("Player "+p.getName()+" moved to "+p.getCurrentPosition());
             }
-            assertEquals(game.getGameStatus(),GameStatus.TERMINATED);
+            assertEquals(gameService.getGameStatus(),GameStatus.TERMINATED);
             System.out.println("Game Over !\n");
         }
     }
@@ -141,16 +110,12 @@ public class GameTest {
     public void testFirstPlayerWinGameTermination(){
             System.out.println("Starting new Game...");
 
-            Game game = new Game(board,players,DiceFactory.getDefault());
-            gameService = new DefaultGameService(game);
-            while (game.getGameStatus()==GameStatus.ACTIVE){
+            gameService = new DefaultGameService();
+            gameService.newGame(2,DiceFactory.getDefault());
+            while (gameService.getGameStatus()==GameStatus.ACTIVE){
                 System.out.println("Current Player:"+gameService.getCurrentPlayer().getName());
                 Player p = gameService.play();
                 System.out.println("Player "+p.getName()+" moved to "+p.getCurrentPosition());
-
-                if(p.getPlayerStatus()==PlayerStatus.WON){
-                    assertEquals(game.getGameStatus(),GameStatus.TERMINATED);
-                }
             }
 
             System.out.println("Game Over !\n");

@@ -58,9 +58,11 @@ public class Game {
         if(board.isValidSpot(nextPos)){
             player.moveTo(nextPos);
             if(board.hasSnake(nextPos)){
-                board.getSnake(nextPos).bite(player);
+                nextPos = board.getSnake(nextPos).bite();
+                movePlayer(player,nextPos);
             }else if(board.hasLadder(nextPos)){
-                board.getLadder(nextPos).climb(player);
+                nextPos = board.getLadder(nextPos).climb();
+                movePlayer(player,nextPos);
             }
         }
 

@@ -16,7 +16,7 @@ public class Ladder {
         this.end = end;
     }
 
-    public void climb(Player player){
-        player.moveTo(end);
+    public int climb(){
+        return end;
     }
 }

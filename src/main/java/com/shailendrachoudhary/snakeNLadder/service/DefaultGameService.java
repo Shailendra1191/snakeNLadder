@@ -3,14 +3,24 @@ import com.shailendrachoudhary.snakeNLadder.constants.GameStatus;
 import com.shailendrachoudhary.snakeNLadder.constants.PlayerStatus;
 import com.shailendrachoudhary.snakeNLadder.exceptions.GameOverException;
 import com.shailendrachoudhary.snakeNLadder.exceptions.InvalidGameException;
-import com.shailendrachoudhary.snakeNLadder.model.Game;
-import com.shailendrachoudhary.snakeNLadder.model.Player;
+import com.shailendrachoudhary.snakeNLadder.model.*;
+import com.shailendrachoudhary.snakeNLadder.repo.BoardRepo;
+
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class DefaultGameService implements GameService{
     private Game game;
 
-    public DefaultGameService(Game game){
-        this.game = game;
+    public DefaultGameService(){}
+
+    @Override
+    public void newGame(int players, Dice dice) {
+        game = new Game(new BoardRepo().getDefaultBoard(),
+                IntStream.range(1,players+1).mapToObj(i->new Player("player"+i)).collect(Collectors.toList()),
+                dice
+        );
     }
 
     @Override
@@ -43,6 +53,11 @@ public class DefaultGameService implements GameService{
 
     public void terminateGame(){
         game.setGameStatus(GameStatus.TERMINATED);
+    }
+
+    @Override
+    public GameStatus getGameStatus() {
+        return game.getGameStatus();
     }
 
 }

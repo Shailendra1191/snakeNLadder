@@ -16,7 +16,7 @@ public class Snake {
         this.end = end;
     }
 
-    public void bite(Player player){
-        player.moveTo(this.end);
+    public int bite(){
+        return end;
     }
 }

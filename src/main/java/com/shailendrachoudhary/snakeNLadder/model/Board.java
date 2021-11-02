@@ -46,18 +46,28 @@ public class Board {
     }
 
     public boolean isValidSpot(int pos){
-        return pos>=0 && pos<size;
+        return pos>0 && pos<=size;
     }
 
     public boolean isFinalSpot(int pos){
-        return pos == size - 1;
+        return pos == size;
     }
 
     public void validate(){
         for(int key : snakes.keySet()){
             if(ladders.containsKey(key)){
-                throw new InvalidLadderException("Can't climb the ladder snake will bite you at:"+key);
+                throw new InvalidLadderException("Can't climb the ladder at this point snake will bite you at:"+key);
             }
         }
+
+        // player will fall in loop if snakes mouth is at top of ladder and snakes tail is at bottom
+        for(Snake sn : snakes.values()){
+            for(Ladder ld: ladders.values()){
+                if(sn.getEnd()==ld.getStart() && sn.getStart()==ld.getEnd()){
+                    throw new InvalidLadderException("Snake and Ladder forms a loop between "+ld.getStart()+" "+ld.getEnd());
+                }
+            }
+        }
+
     }
 }
